@@ -68,37 +68,131 @@ void HEAP_SORT(int *A) {
 
 /******* FUnctions for priority queue ******/
 void MAX_HEAP_INSERT(int *A, int value) {
+	if (HEAP_SIZE + 1 > ARRAY_SIZE) {
+		printf("MAX_HEAP_INSERT: HEAP overflow\n");
+		return;
+	}
+	
+	int parent;
+	int i = HEAP_SIZE;
+	HEAP_SIZE++;
 
+	A[HEAP_SIZE - 1] = value;
+	
+	parent = PARENT(i);
+	while (parent != i) {
+		if (A[parent] < A[i]) {
+			swap(A, parent, i);
+			i = parent;
+			parent = PARENT(i);
+		}
+		else 
+			break;
+	}
 }
 
 int MAX_HEAP_EXTRACT(int *A) {
-	return A[0];
+	swap(A, 0, HEAP_SIZE-1);
+	HEAP_SIZE--;
+	MAX_HEAPIFY(A, 0);
+	return A[HEAP_SIZE];
 }
 
-void MAX_HEAP_INCREASE_KEY(int *A, int i) {
+void MAX_HEAP_INCREASE_KEY(int *A, int i, int k) {
+	if (i < 0 || i >= HEAP_SIZE) 
+		return;
 
+	if (k <= A[i]) {
+		printf("MAX_HEAP_INCREASE_KEY: new value must bigger than old one\n");
+		return;
+	}
+	A[i] = k;
+	
+	int parent = PARENT(i);
+	while (parent != i) { 
+		if (A[parent] < A[i]) {
+			swap(A, parent, i);
+			i = parent;
+			parent = PARENT(i);
+		}
+		else 
+			break;
+	}
+	
 }
 
 int MAX_HEAP_GET_MAXIMUM(int *A) {
-	
 	return A[0];
 }
 
 void PRINT_A(int *A, int size) {
-	printf("+++++++++++++ PRINT_A ++++++++++++++\n");
+	printf("[PRINT_A]: ");
 	for (int i = 0; i < size; i++) {
 		printf(" %d", A[i]);
 	}
-	printf("\n-------------------------------\n");
+	printf("\n");
 }
-int main(int agrc, char **argv) {
-	int A[ARRAY_SIZE] = {4, 1, 3, 2, 16, 9, 10, 14, 8, 7, 0, };
-	HEAP_SIZE = 10;
-	
+
+void test_heap_sort(int *A) {
+	printf("+++++++++++   test_heap_sort     ++++++++++++++\n");
+	printf(" 1. Init ..\n");
+
 	PRINT_A(A, ARRAY_SIZE);
-	
+	printf(" 2. Run HEAP_SORT ..\n");
 	HEAP_SORT(A);
+	printf(" 3. HEAP_SORT done\n");
+	PRINT_A(A, ARRAY_SIZE);
+	printf("-----------   test_heap_sort     ---------------\n\n\n");
+}
+
+void test_priority_queue_extract(int *A) {
+	printf("+++++++++++    test_priority_queue_extract [void] ++++++++++++++\n");
+	PRINT_A(A, HEAP_SIZE);
+	printf("  Extracting ....\n");
+	int max = MAX_HEAP_EXTRACT(A); 
+	printf("  Extract Result: MAX = %d\n", max);
+	// print output 
+	PRINT_A(A, HEAP_SIZE);
+	printf("-------------   test_priority_queue_extract [void] -------------------\n\n\n");
+}
+
+void test_priority_queue_insert(int *A, int value) {
+	printf("+++++++++++++  test_priority_queue_insert [%d] ++++++++++++++++++\n", value);
+	PRINT_A(A, HEAP_SIZE);
+	printf("  MAX_HEAP inserting value %d...\n", value);
+	MAX_HEAP_INSERT(A, value);
+	printf("  MAX_HEAP_INSERT: done\n");
+	PRINT_A(A, HEAP_SIZE);
+	printf("-------------  test_priority_queue_insert [%d] ------------------\n\n\n", value);
+}
+
+void test_priority_queue_increase(int *A, int i, int k) {
+	printf("+++++++++++++  test_priority_queue_increase [pos=%d, value=%d] ++++++++++++++++++\n", i, k);
+	PRINT_A(A, HEAP_SIZE);
+	printf("  MAX_HEAP_INCREASE_KEY(%d, %d) running ...\n", i, k);
+	MAX_HEAP_INCREASE_KEY(A, i , k);
+	printf("  MAX_HEAP_INCREASE_KEY done\n");
+	PRINT_A(A, HEAP_SIZE);
+	printf("-------------  test_priority_queue_increase  ------------------\n\n\n");
+}
+
+int main(int agrc, char **argv) {
+	int A1[ARRAY_SIZE] = {4, 1, 3, 2, 16, 9, 10, 14, 8, 7, 0, };
+	int A2[ARRAY_SIZE] = {4, 1, 3, 2, 16, 9, 10, 14, 8, 7, 0, };
 	
-	PRINT_A(A,ARRAY_SIZE);
+	// test HEAP_SORT using A1 array 
+	HEAP_SIZE = 10;
+	test_heap_sort(A1);
+
+	// test priority queue using A2 array 
+	HEAP_SIZE = 10;
+	BUILD_MAX_HEAP(A2);
+	
+	PRINT_A(A2,ARRAY_SIZE);
+
+	test_priority_queue_extract(A2);
+	test_priority_queue_insert(A2, 16);
+	test_priority_queue_increase(A2, 8, 15);
+
 	return 0;
 } 
